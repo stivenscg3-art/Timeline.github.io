@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expediente Bicentenario — Colombia y el Mundo, 1860–2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F2ECDD;
+    --paper-deep: #E9E0C9;
+    --ink: #2B2419;
+    --ink-soft: #5B5240;
+    --gold: #B9912B;
+    --gold-deep: #8A6B1C;
+    --blue: #1E3A5F;
+    --blue-soft: #2C5078;
+    --red: #8B2E2E;
+    --red-soft: #A8453E;
+    --line: rgba(43,36,25,0.18);
+    --line-strong: rgba(43,36,25,0.35);
+    --shadow: 0 8px 24px rgba(43,36,25,0.14);
+    --shadow-soft: 0 2px 8px rgba(43,36,25,0.08);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top, rgba(185,145,43,0.06), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Subtle paper texture via layered gradients */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(43,36,25,0.015) 0px, transparent 1px, transparent 2px),
+      repeating-linear-gradient(90deg, rgba(43,36,25,0.012) 0px, transparent 1px, transparent 2px);
+  }
+
+  .mono{font-family:'Space Mono', monospace;}
+
+  /* ===== HEADER ===== */
+  header{
+    position:relative;
+    z-index:2;
+    padding:64px 24px 40px;
+    text-align:center;
+    border-bottom:3px double var(--line-strong);
+  }
+  .crest{
+    width:64px;height:64px;margin:0 auto 18px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(2.1rem, 5vw, 3.6rem);
+    font-weight:700;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+    line-height:1.08;
+  }
+  .subtitle{
+    font-size:clamp(0.95rem, 2vw, 1.15rem);
+    color:var(--ink-soft);
+    font-style:italic;
+    max-width:560px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+  .header-rule{
+    width:120px;height:1px;
+    background:var(--gold);
+    margin:24px auto 0;
+    position:relative;
+  }
+  .header-rule::before, .header-rule::after{
+    content:"";
+    position:absolute;top:50%;
+    width:5px;height:5px;
+    background:var(--gold);
+    border-radius:50%;
+    transform:translateY(-50%);
+  }
+  .header-rule::before{left:-10px;}
+  .header-rule::after{right:-10px;}
+
+  /* ===== CONTROLS ===== */
+  .controls{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(242,236,221,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:14px 20px;
+  }
+  .controls-inner{
+    max-width:980px;
+    margin:0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+  }
+  .filter-label{
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-right:4px;
+  }
+  .chip{
+    font-family:'Space Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.02em;
+    padding:7px 14px;
+    border:1px solid var(--line-strong);
+    border-radius:2px;
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all 0.15s ease;
+    white-space:nowrap;
+  }
+  .chip:hover{
+    border-color:var(--gold-deep);
+    color:var(--ink);
+  }
+  .chip.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+  }
+  .chip.active.c-colombia{background:var(--blue);border-color:var(--blue);}
+  .chip.active.c-mundo{background:var(--red-soft);border-color:var(--red-soft);}
+
+  .search-wrap{
+    position:relative;
+    margin-left:auto;
+  }
+  #searchInput{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    padding:7px 12px 7px 30px;
+    border:1px solid var(--line-strong);
+    border-radius:2px;
+    background:var(--paper);
+    color:var(--ink);
+    width:160px;
+    transition:width 0.2s ease, border-color 0.2s ease;
+  }
+  #searchInput:focus{
+    outline:none;
+    border-color:var(--gold-deep);
+    width:220px;
+  }
+  .search-icon{
+    position:absolute;left:10px;top:50%;
+    transform:translateY(-50%);
+    font-size:12px;
+    color:var(--ink-soft);
+    pointer-events:none;
+  }
+
+  /* ===== TIMELINE ===== */
+  .timeline-wrap{
+    position:relative;
+    max-width:1040px;
+    margin:0 auto;
+    padding:56px 20px 100px;
+    z-index:1;
+  }
+  .spine{
+    position:absolute;
+    left:50%;
+    top:56px;
+    bottom:80px;
+    width:2px;
+    background:linear-gradient(to bottom, transparent, var(--line-strong) 3%, var(--line-strong) 97%, transparent);
+    transform:translateX(-50%);
+  }
+
+  .column-headers{
+    display:grid;
+    grid-template-columns:1fr 64px 1fr;
+    max-width:1040px;
+    margin:0 auto 8px;
+    padding:0 20px;
+  }
+  .col-h{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    text-align:center;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .col-h.colombia{color:var(--blue); text-align:right; padding-right:14px;}
+  .col-h.mundo{color:var(--red-soft); text-align:left; padding-left:14px;}
+
+  .year-row{
+    display:grid;
+    grid-template-columns:1fr 64px 1fr;
+    align-items:start;
+    gap:0;
+    position:relative;
+    margin-bottom:36px;
+  }
+  .year-row.hidden{display:none;}
+
+  .year-seal{
+    position:relative;
+    z-index:2;
+    width:60px;height:60px;
+    border-radius:50%;
+    background:var(--paper);
+    border:2px solid var(--gold-deep);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto;
+    box-shadow:0 0 0 5px var(--paper), var(--shadow-soft);
+  }
+  .year-seal::before{
+    content:"";
+    position:absolute;
+    inset:5px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    opacity:0.5;
+  }
+  .year-seal span{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:13px;
+    color:var(--gold-deep);
+  }
+
+  .event-card{
+    position:relative;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:18px 20px;
+    cursor:pointer;
+    transition:box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+    max-width:420px;
+  }
+  .event-card:hover{
+    box-shadow:var(--shadow);
+    transform:translateY(-2px);
+  }
+  .event-card.hidden{visibility:hidden; opacity:0; pointer-events:none;}
+  .event-card.empty-slot{
+    background:transparent;
+    border:1px dashed var(--line);
+    box-shadow:none;
+    cursor:default;
+  }
+  .event-card.empty-slot:hover{transform:none;box-shadow:none;}
+
+  .card-colombia{
+    margin-left:auto;
+    border-left:3px solid var(--blue);
+    text-align:right;
+  }
+  .card-mundo{
+    margin-right:auto;
+    border-right:3px solid var(--red-soft);
+    text-align:left;
+  }
+
+  .card-category{
+    display:inline-block;
+    font-family:'Space Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+    opacity:0.75;
+  }
+  .card-title{
+    font-size:1.02rem;
+    font-weight:600;
+    line-height:1.32;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .card-excerpt{
+    font-size:0.86rem;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin:0;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .card-full{
+    display:none;
+    font-size:0.92rem;
+    line-height:1.65;
+    color:var(--ink);
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .event-card.expanded .card-excerpt{display:none;}
+  .event-card.expanded .card-full{display:block;}
+  .event-card.expanded{box-shadow:var(--shadow);}
+
+  .card-toggle{
+    margin-top:10px;
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+  }
+  .card-colombia .card-toggle{text-align:right;}
+  .card-mundo .card-toggle{text-align:left;}
+
+  /* Glossary term */
+  .term{
+    border-bottom:1.5px dotted var(--gold-deep);
+    cursor:help;
+    position:relative;
+    color:inherit;
+  }
+
+  /* Tooltip */
+  .gloss-tooltip{
+    position:fixed;
+    z-index:200;
+    max-width:280px;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Source Serif 4', serif;
+    font-size:0.82rem;
+    line-height:1.5;
+    padding:12px 14px;
+    border-radius:3px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity 0.15s ease, transform 0.15s ease;
+    pointer-events:none;
+  }
+  .gloss-tooltip.visible{opacity:1; transform:translateY(0);}
+  .gloss-tooltip .gloss-term{
+    display:block;
+    font-family:'Space Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:5px;
+  }
+
+  /* ===== Empty state ===== */
+  .no-results{
+    text-align:center;
+    padding:80px 20px;
+    color:var(--ink-soft);
+    font-style:italic;
+    display:none;
+  }
+  .no-results.visible{display:block;}
+
+  /* ===== FOOTER ===== */
+  footer{
+    text-align:center;
+    padding:40px 20px 56px;
+    border-top:1px solid var(--line);
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+
+  /* ===== Mobile ===== */
+  @media (max-width: 720px){
+    .column-headers{display:none;}
+    .year-row{grid-template-columns:48px 1fr;}
+    .spine{left:24px;}
+    .year-seal{width:46px;height:46px;margin:0;}
+    .year-seal span{font-size:10.5px;}
+    .event-card{max-width:none;margin:0 0 14px;text-align:left !important;border-left:3px solid var(--line) !important;border-right:none !important;padding:16px;}
+    .card-colombia{border-left:3px solid var(--blue) !important;}
+    .card-mundo{border-left:3px solid var(--red-soft) !important;}
+    .card-toggle{text-align:left !important;}
+    .card-pair{grid-column:2; display:flex; flex-direction:column; gap:0;}
+    .controls-inner{justify-content:flex-start;}
+    .search-wrap{margin-left:0; width:100%;}
+    #searchInput, #searchInput:focus{width:100%;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+  }
+
+  :focus-visible{outline:2px solid var(--gold-deep); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="crest">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="28" r="26" stroke="#B9912B" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="20" stroke="#B9912B" stroke-width="1"/>
+      <path d="M28 14 L31 24 L41 24 L33 30 L36 40 L28 34 L20 40 L23 30 L15 24 L25 24 Z" fill="#1E3A5F" opacity="0.85"/>
+    </svg>
+  </div>
+  <div class="eyebrow">Archivo Histórico Comparado</div>
+  <h1>Colombia y el Mundo</h1>
+  <p class="subtitle">Una línea de tiempo bienal, de 1860 a 2026 — el curso de la nación junto al curso del siglo.</p>
+  <div class="header-rule"></div>
+</header>
+
+<div class="controls">
+  <div class="controls-inner">
+    <span class="filter-label">Mostrar</span>
+    <button class="chip active c-colombia" data-side="colombia">Colombia</button>
+    <button class="chip active c-mundo" data-side="mundo">El Mundo</button>
+    <span class="filter-label" style="margin-left:10px;">Categoría</span>
+    <select id="categorySelect" class="chip" style="cursor:pointer;">
+      <option value="todas">Todas</option>
+    </select>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Buscar evento o año…" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<div class="timeline-wrap">
+  <div class="column-headers">
+    <div class="col-h colombia">Colombia</div>
+    <div></div>
+    <div class="col-h mundo">El Mundo</div>
+  </div>
+  <div class="spine"></div>
+  <div id="timelineContainer"></div>
+  <div class="no-results" id="noResults">No se encontraron eventos para esta búsqueda o filtro.</div>
+</div>
+
+<footer>
+  Expediente Bicentenario · Fuentes: registro histórico nacional e internacional · 1860 — 2026
+</footer>
+
+<div class="gloss-tooltip" id="tooltip"><span class="gloss-term"></span><span class="gloss-text"></span></div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  const container = document.getElementById('timelineContainer');
+  const noResults = document.getElementById('noResults');
+  const tooltip = document.getElementById('tooltip');
+  const tooltipTerm = tooltip.querySelector('.gloss-term');
+  const tooltipText = tooltip.querySelector('.gloss-text');
+  const categorySelect = document.getElementById('categorySelect');
+  const searchInput = document.getElementById('searchInput');
+
+  let activeSides = new Set(['colombia','mundo']);
+  let activeCategory = 'todas';
+  let searchTerm = '';
+
+  // Populate category dropdown
+  CATEGORIAS.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+
+  // Glossary term replacement: [[term]] or [[term|display]]
+  function processText(text){
+    return text.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (match, key, display) => {
+      const shown = display || key;
+      const def = GLOSARIO[key];
+      if(!def) return shown;
+      return `<span class="term" data-term="${key.replace(/"/g,'&quot;')}">${shown}</span>`;
+    });
+  }
+
+  function plainText(text){
+    return text.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, key, display) => display || key);
+  }
+
+  function buildCard(entry, side){
+    const div = document.createElement('div');
+    div.className = `event-card card-${side}`;
+    div.dataset.side = side;
+    div.dataset.category = entry.category;
+    div.dataset.year = '';
+
+    const excerpt = plainText(entry.text);
+    const shortExcerpt = excerpt.length > 110 ? excerpt.slice(0,110).trim() + '…' : excerpt;
+
+    div.innerHTML = `
+      <span class="card-category">${entry.category}</span>
+      <h3 class="card-title">${entry.title}</h3>
+      <p class="card-excerpt">${shortExcerpt}</p>
+      <div class="card-full">${processText(entry.text)}</div>
+      <div class="card-toggle">Leer más ↓</div>
+    `;
+
+    div.addEventListener('click', (e) => {
+      if(e.target.classList.contains('term')) return;
+      const willExpand = !div.classList.contains('expanded');
+      div.classList.toggle('expanded');
+      div.querySelector('.card-toggle').textContent = willExpand ? 'Cerrar ↑' : 'Leer más ↓';
+    });
+
+    return div;
+  }
+
+  function render(){
+    container.innerHTML = '';
+    let visibleCount = 0;
+
+    TIMELINE.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'year-row';
+      row.dataset.year = item.year;
+
+      // Determine visibility per side based on filters
+      const matchesSearch = (entry) => {
+        if(!searchTerm) return true;
+        const haystack = (entry.title + ' ' + plainText(entry.text) + ' ' + item.year).toLowerCase();
+        return haystack.includes(searchTerm);
+      };
+      const matchesCategory = (entry) => activeCategory === 'todas' || entry.category === activeCategory;
+
+      const showColombia = activeSides.has('colombia') && matchesSearch(item.colombia) && matchesCategory(item.colombia);
+      const showMundo = activeSides.has('mundo') && matchesSearch(item.mundo) && matchesCategory(item.mundo);
+
+      // If neither side matches, hide entire row
+      if(!showColombia && !showMundo){
+        row.classList.add('hidden');
+        container.appendChild(row);
+        return;
+      }
+
+      visibleCount++;
+
+      const colombiaCard = activeSides.has('colombia') ? buildCard(item.colombia, 'colombia') : null;
+      if(colombiaCard && !showColombia) colombiaCard.classList.add('hidden');
+
+      const seal = document.createElement('div');
+      seal.className = 'year-seal';
+      seal.innerHTML = `<span>${item.year}</span>`;
+
+      const mundoCard = activeSides.has('mundo') ? buildCard(item.mundo, 'mundo') : null;
+      if(mundoCard && !showMundo) mundoCard.classList.add('hidden');
+
+      const leftSlot = document.createElement('div');
+      if(colombiaCard) leftSlot.appendChild(colombiaCard);
+
+      const rightSlot = document.createElement('div');
+      if(mundoCard) rightSlot.appendChild(mundoCard);
+
+      row.appendChild(leftSlot);
+      row.appendChild(seal);
+      row.appendChild(rightSlot);
+      container.appendChild(row);
+    });
+
+    noResults.classList.toggle('visible', visibleCount === 0);
+  }
+
+  // ===== Filter handlers =====
+  document.querySelectorAll('.chip[data-side]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const side = btn.dataset.side;
+      if(activeSides.has(side)){
+        if(activeSides.size === 1) return; // keep at least one
+        activeSides.delete(side);
+        btn.classList.remove('active');
+      } else {
+        activeSides.add(side);
+        btn.classList.add('active');
+      }
+      render();
+    });
+  });
+
+  categorySelect.addEventListener('change', () => {
+    activeCategory = categorySelect.value;
+    render();
+  });
+
+  let searchDebounce;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      searchTerm = searchInput.value.trim().toLowerCase();
+      render();
+    }, 150);
+  });
+
+  // ===== Glossary tooltip (hover + tap) =====
+  function showTooltip(el){
+    const key = el.dataset.term;
+    const def = GLOSARIO[key];
+    if(!def) return;
+    tooltipTerm.textContent = key;
+    tooltipText.textContent = def;
+    const rect = el.getBoundingClientRect();
+    const tw = 280;
+    let left = rect.left + rect.width/2 - tw/2;
+    left = Math.max(12, Math.min(left, window.innerWidth - tw - 12));
+    let top = rect.top - 10;
+    tooltip.style.left = left + 'px';
+    tooltip.style.maxWidth = tw + 'px';
+
+    // measure height after content set
+    tooltip.classList.add('visible');
+    const th = tooltip.offsetHeight;
+    if(top - th < 8){
+      top = rect.bottom + 10;
+      tooltip.style.top = top + 'px';
+    } else {
+      tooltip.style.top = (top - th) + 'px';
+    }
+  }
+  function hideTooltip(){
+    tooltip.classList.remove('visible');
+  }
+
+  document.addEventListener('mouseover', (e) => {
+    if(e.target.classList && e.target.classList.contains('term')) showTooltip(e.target);
+  });
+  document.addEventListener('mouseout', (e) => {
+    if(e.target.classList && e.target.classList.contains('term')) hideTooltip();
+  });
+  document.addEventListener('click', (e) => {
+    if(e.target.classList && e.target.classList.contains('term')){
+      e.stopPropagation();
+      if(tooltip.classList.contains('visible')){
+        hideTooltip();
+      } else {
+        showTooltip(e.target);
+      }
+    } else if(!e.target.closest('.gloss-tooltip')){
+      hideTooltip();
+    }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
